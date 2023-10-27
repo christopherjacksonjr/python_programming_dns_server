@@ -31,20 +31,20 @@ def generate_aes_key(password, salt):
     return key
     
 def encrypt_with_aes(input_string, password, salt):
-    key = generate_aes_key(????)
-    f = Fernet(???)
-    encrypted_data = f.????(????.encode('utf-8')) #call the Fernet encrypt method
+    key = generate_aes_key(password, salt)
+    f = Fernet(key)
+    encrypted_data = f.encrypt(input_string.encode('utf-8')) #call the Fernet encrypt method
     return encrypted_data    
 
 def decrypt_with_aes(encrypted_data, password, salt):
-    key = generate_aes_key(????)
-    f = Fernet(????)
-    decrypted_data = f.????(????) #call the Fernet decrypt method
+    key = generate_aes_key(password, salt)
+    f = Fernet(key)
+    decrypted_data = f.decrypt(encrypted_data) #call the Fernet decrypt method
     return decrypted_data.decode('utf-8')
 
-salt = ???? # Remember it should be a byte-object
-password = ?????
-input_string = ?????
+salt = bytes('Tandon', 'utf-8') # Remember it should be a byte-object
+password = 'cj2577@nyu.edu'
+input_string = 'AlwaysWatching'
 
 encrypted_value = encrypt_with_aes(input_string, password, salt) # test function
 decrypted_value = decrypt_with_aes(encrypted_value, password, salt)  # test function
@@ -73,25 +73,44 @@ dns_records = {
             1800, #retry
             604800, #expire
             86400, #minimum
-        ),
+        )
     },
+    'safebank.com.': {
+        dns.rdatatype.A: '192.168.1.102'
+    },
+    'google.com.': {
+        dns.rdatatype.A: '192.168.1.103'
+    },
+    'legitsite.com.': {
+        dns.rdatatype.A: '192.168.1.104'
+    },
+    'yahoo.com.': {
+        dns.rdatatype.A: '192.168.1.105'
+    },
+    'nyu.edu.': {
+        dns.rdatatype.A: '192.168.1.106',
+        dns.rdatatype.AAAA: '2001:0db8:85a3:0000:0000:8a2e:0373:7312',
+        dns.rdatatype.MX: ['10, mxa-00256a01.gslb.pphosted.com.'],
+        dns.rdatatype.NS: 'ns1.nyu.edu.',
+        dns.rdatatype.TXT: input_string
+    }
    
     # Add more records as needed (see assignment instructions!
 }
 
 def run_dns_server():
     # Create a UDP socket and bind it to the local IP address and port (the standard port for DNS)
-    server_socket = socket.socket(socket.AF_INET, ????) # Research this
-    server_socket.bind((?????, ????))
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Research this
+    server_socket.bind(('10.2.1.229', '80'))
 
     while True:
         try:
             # Wait for incoming DNS requests
             data, addr = server_socket.recvfrom(1024)
             # Parse the request using the `dns.message.from_wire` method
-            request = ?????
+            request = dns.message.from_wire(data)
             # Create a response message using the `dns.message.make_response` method
-            response = ??????
+            response = dns.message.make_response(request)
 
             # Get the question from the request
             question = request.question[???]
