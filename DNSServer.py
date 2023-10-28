@@ -19,6 +19,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import base64
 import ast
 
+
 def generate_aes_key(password, salt):
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
@@ -29,31 +30,36 @@ def generate_aes_key(password, salt):
     key = kdf.derive(password.encode('utf-8'))
     key = base64.urlsafe_b64encode(key)
     return key
-    
+
+
 def encrypt_with_aes(input_string, password, salt):
     key = generate_aes_key(password, salt)
     f = Fernet(key)
-    encrypted_data = f.encrypt(input_string.encode('utf-8')) #call the Fernet encrypt method
-    return encrypted_data    
+    encrypted_data = f.encrypt(input_string.encode('utf-8'))  # call the Fernet encrypt method
+    return encrypted_data
+
 
 def decrypt_with_aes(encrypted_data, password, salt):
     key = generate_aes_key(password, salt)
     f = Fernet(key)
-    decrypted_data = f.decrypt(encrypted_data) #call the Fernet decrypt method
+    decrypted_data = f.decrypt(encrypted_data)  # call the Fernet decrypt method
     return decrypted_data.decode('utf-8')
 
-salt = bytes('Tandon', 'utf-8') # Remember it should be a byte-object
+
+salt = bytes('Tandon', 'utf-8')  # Remember it should be a byte-object
 password = 'cj2577@nyu.edu'
 input_string = 'AlwaysWatching'
 
-encrypted_value = encrypt_with_aes(input_string, password, salt) # test function
+encrypted_value = encrypt_with_aes(input_string, password, salt)  # test function
 decrypted_value = decrypt_with_aes(encrypted_value, password, salt)  # test function
 
-# For future use    
+
+# For future use
 def generate_sha256_hash(input_string):
     sha256_hash = hashlib.sha256()
     sha256_hash.update(input_string.encode('utf-8'))
     return sha256_hash.hexdigest()
+
 
 # A dictionary containing DNS records mapping hostnames to different types of DNS data.
 dns_records = {
@@ -65,13 +71,13 @@ dns_records = {
         dns.rdatatype.NS: 'ns.example.com.',
         dns.rdatatype.TXT: ('This is a TXT record',),
         dns.rdatatype.SOA: (
-            'ns1.example.com.', #mname
-            'admin.example.com.', #rname
-            2023081401, #serial
-            3600, #refresh
-            1800, #retry
-            604800, #expire
-            86400, #minimum
+            'ns1.example.com.',  # mname
+            'admin.example.com.',  # rname
+            2023081401,  # serial
+            3600,  # refresh
+            1800,  # retry
+            604800,  # expire
+            86400,  # minimum
         )
     },
     'safebank.com.': {
@@ -93,14 +99,15 @@ dns_records = {
         dns.rdatatype.NS: 'ns1.nyu.edu.',
         dns.rdatatype.TXT: input_string
     }
-   
+
     # Add more records as needed (see assignment instructions!
 }
+
 
 def run_dns_server():
     # Create a UDP socket and bind it to the local IP address and port (the standard port for DNS)
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Research this
-    server_socket.bind(('127.0.0.1', 53))
+    server_socket.bind(('', 53))
 
     while True:
         try:
@@ -127,8 +134,12 @@ def run_dns_server():
                     for pref, server in answer_data:
                         rdata_list.append(MX(dns.rdataclass.IN, dns.rdatatype.MX, pref, server))
                 elif qtype == dns.rdatatype.SOA:
-                    (dns.rdatatype.A, dns.rdatatype.AA, dns.rdatatype.MX, dns.rdatatype.CNAME, dns.rdatatype.NS, dns.rdatatype.TXT, dns.rdatatype.SOA) = answer_data # What is the record format? See dns_records dictionary. Assume we handle @, Class, TTL elsewhere. Do some research on SOA Records
-                    rdata = SOA(dns.rdataclass.IN, dns.rdatatype.SOA, dns.rdatatype.A, dns.rdatatype.AA, dns.rdatatype.MX, dns.rdatatype.CNAME, dns.rdatatype.NS, dns.rdatatype.TXT) # follow format from previous line
+                    (dns.rdatatype.A, dns.rdatatype.AA, dns.rdatatype.MX, dns.rdatatype.CNAME, dns.rdatatype.NS,
+                     dns.rdatatype.TXT,
+                     dns.rdatatype.SOA) = answer_data  # What is the record format? See dns_records dictionary. Assume we handle @, Class, TTL elsewhere. Do some research on SOA Records
+                    rdata = SOA(dns.rdataclass.IN, dns.rdatatype.SOA, dns.rdatatype.A, dns.rdatatype.AA,
+                                dns.rdatatype.MX, dns.rdatatype.CNAME, dns.rdatatype.NS,
+                                dns.rdatatype.TXT)  # follow format from previous line
                     rdata_list.append(rdata)
                 else:
                     if isinstance(answer_data, str):
