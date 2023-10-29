@@ -126,7 +126,7 @@ def run_dns_server():
 
                 if qtype == dns.rdatatype.MX:
                     for data in answer_data:
-                        rdata_list.append(MX(dns.rdataclass.IN, dns.rdatatype.MX, data))
+                        rdata_list.append(MX(dns.rdataclass.IN, dns.rdatatype.MX, data, answer_data))
                 elif qtype == dns.rdatatype.SOA:
                     (dns.rdatatype.A, dns.rdatatype.AA, dns.rdatatype.MX, dns.rdatatype.CNAME, dns.rdatatype.NS,
                      dns.rdatatype.TXT,
